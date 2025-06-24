@@ -31,10 +31,12 @@ const taskStore = createSlice({
         );
     
     },
-    removeTask: (state, action: { payload: Task }) => {},
+    removeTask: (state, action: { payload: string | number }) => {
+      state.taskList = state.taskList.filter((task) => task.id != action.payload)
+    },
   },
 });
 
-export const { addTask, removeTask, toggleTask } = taskStore.actions;
+export const { addTask, toggleTask,removeTask } = taskStore.actions;
 
 export default taskStore.reducer;

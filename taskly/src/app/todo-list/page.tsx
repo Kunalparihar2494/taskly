@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { addTask, toggleTask } from "../store/taskStore";
+import { addTask, removeTask, toggleTask } from "../store/taskStore";
 
 const TodoList = () => {
   const [tasks, setTasks] = useState<
@@ -26,12 +26,17 @@ const TodoList = () => {
     settaskName("");
   };
 
-  const handleCheckboxChange = (id) => {
+  const handleCheckboxChange = (id: string | number) => {
     const updatedTasks = tasks.map((task) =>
       task.id === id ? { ...task, isChecked: !task.isChecked } : task
     );
     setTasks(updatedTasks);
     dispatch(toggleTask(id));
+  };
+
+  const handleDelete = (id: string | number) => {
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+    dispatch(removeTask(id));
   };
 
   return (
@@ -79,12 +84,18 @@ const TodoList = () => {
                       />
                       <label
                         htmlFor="vue-checkbox"
-                        className={`w-full py-3 ms-2 pl-2 text-xl font-medium text-gray-900 dark:text-gray-300 ${
+                        className={`w-[68%] md:w-[78%] py-3 ms-2 pl-2 text-xl font-medium text-gray-900 dark:text-gray-300 break-words whitespace-normal ${
                           task.isChecked ? "line-through" : ""
                         }`}
                       >
                         {task.name}
                       </label>
+                      <span
+                        onClick={() => handleDelete(task.id)}
+                        className="bg-red-100 cursor-pointer text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300"
+                      >
+                        Delete
+                      </span>
                     </div>
                   </li>
                 </ul>

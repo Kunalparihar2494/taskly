@@ -13,7 +13,18 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ message }) => {
   const router = useRouter();
-  const user = useSelector((store) => store.user);
+  // Define RootState type to match your Redux store structure
+  interface RootState {
+    user: {
+      user: {
+        uid: string;
+        email: string | null;
+        displayName: string | null;
+      } | null;
+    };
+  }
+
+  const user = useSelector((store: RootState) => store.user);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -29,12 +40,12 @@ const Header: React.FC<HeaderProps> = ({ message }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [dispatch,router]);
 
   const handleSignOut = () => {
     signOut(auth)
       .then(() => {})
-      .catch((error) => {});
+      .catch(() => {});
   };
 
   return (

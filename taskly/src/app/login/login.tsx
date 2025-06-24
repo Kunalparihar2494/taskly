@@ -5,10 +5,10 @@ import {
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import { auth, db } from "../config/firebase";
+import { auth } from "../config/firebase";
 import { checkValidateData } from "../utlis/Validate";
 import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addUser } from "../store/userStore";
 import Loading from "../utlis/Loading";
 
@@ -19,15 +19,16 @@ const Login = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
+  const fullName = useRef<HTMLInputElement>(null);
   const email = useRef<HTMLInputElement>(null);
   const password = useRef<HTMLInputElement>(null);
   const confirmPassword = useRef<HTMLInputElement>(null);
-  const fullName = useRef<HTMLInputElement>(null);
 
   const handleButtonClick = () => {
     setIsLoading(true);
     const emailValue = email.current?.value;
     const passwordValue = password.current?.value;
+    const name = fullName?.current?.value;
 
     if (!emailValue || !passwordValue) {
       setErrorMessage("Email and password are required.");
@@ -44,19 +45,25 @@ const Login = () => {
           const user = userCredential.user;
           setIsLoading(false);
           dispatch(addUser(user));
-          updateProfile(user, {
-            displayName: fullName?.current?.value,
-          })
-            .then(() => {
-              router.push("/dashboard");
+          if (name) {
+            updateProfile(user, {
+              displayName: name,
             })
-            .catch((error) => {
-              console.error("Error updating profile:", error);
-            });
+              .then(() => {
+                router.push("/dashboard");
+              })
+              .catch((error) => {
+                console.error("Error updating profile:", error);
+              });
+          }else{
+            console.error('Invalid Request');
+            
+          }
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
+          setIsLoading(false);
           setErrorMessage(errorCode + "-" + errorMessage);
         });
     } else {
@@ -70,20 +77,9 @@ const Login = () => {
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
+          setIsLoading(false);
           setErrorMessage(errorCode + "-" + errorMessage);
         });
-    }
-  };
-
-  const setInputEmpty = () => {
-    if (fullName.current) {
-      fullName.current.value = "";
-    }
-    if (email.current) {
-      email.current.value = "";
-    }
-    if (password.current) {
-      password.current.value = "";
     }
   };
 
